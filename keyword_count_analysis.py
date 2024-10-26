@@ -1,8 +1,8 @@
 import requests
-from bs4 import BeautifulSoup
 import pandas as pd
 import re
 import streamlit as st
+import html
 
 # Function to get the webpage content
 def get_webpage_content(url):
@@ -23,11 +23,17 @@ def read_keywords_from_file(file):
         st.error(f"Error reading keywords file: {e}")
         return []
 
+# Function to remove HTML tags from content
+def remove_html_tags(content):
+    # Use a regular expression to remove HTML tags
+    clean = re.compile('<.*?>')
+    return re.sub(clean, '', content)
+
 # Function to count keyword occurrences accurately using regular expressions
 def count_keywords(content, keywords):
-    # Remove HTML tags using BeautifulSoup
-    soup = BeautifulSoup(content, 'html.parser')
-    text = soup.get_text().lower()  # Convert text to lowercase for case-insensitive search
+    # Remove HTML tags and decode HTML entities
+    text = remove_html_tags(content)
+    text = html.unescape(text).lower()  # Convert text to lowercase for case-insensitive search
 
     # Dictionary to store keyword counts
     keyword_count = {}
